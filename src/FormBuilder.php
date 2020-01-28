@@ -155,6 +155,45 @@ class FormBuilder
         return $this->wrapperInput('<select ' . $attrs . '>' . $optionsList . '</select>');
     }
 
+    private function renderRadios(): string
+    {
+        extract($this->get('options', 'name', 'value', 'label'));
+
+        $fieldValue = $this->getValue();
+        $arrValues = is_array($fieldValue) ? $fieldValue : [$fieldValue];
+        $optionsList = '';
+        foreach ($options as $optlabel => $optvalue) {
+
+            $atts = ['value' => $optvalue, 'type'=>'radio', 'name'=>$name, 'class'=>'form-check-input'];
+            if((((string)$optvalue) == (string)$value)){
+                $atts['checked'] = 'checked';
+            }
+            $attrs = $this->buildHtmlAttrs($atts, false);
+
+            $optionsList .= '<div class="form-check"><input ' . $attrs . '><label class="form-check-label" for="">'.$optlabel.'</label></div>';
+        }
+
+        $attributes = $this->getInputAttributes();
+        $attrs = $this->buildHtmlAttrs($attributes);
+        return $this->wrapperInput($optionsList);
+    }
+
+    private function renderCheckboxes(): string
+    {
+        extract($this->get('options', 'label'));
+        $fieldValue = $this->getValue();
+        $arrValues = is_array($fieldValue) ? $fieldValue : [$fieldValue];
+        $optionsList = '';
+        foreach ($options as $optlabel => $name) {
+            $attrs = $this->buildHtmlAttrs(['value' => 1, 'type'=>'checkbox', 'name'=>$name, 'class'=>'form-check-input'], false);
+            $optionsList .= '<div class="form-check"><input ' . $attrs . '><label class="form-check-label" for="">'.$optlabel.'</label></div>';
+        }
+
+        $attributes = $this->getInputAttributes();
+        $attrs = $this->buildHtmlAttrs($attributes);
+        return $this->wrapperInput($optionsList);
+    }
+
     private function renderTextarea(): string
     {
         $attributes = $this->getInputAttributes();
@@ -188,9 +227,17 @@ class FormBuilder
 
     private function renderButton(): string
     {
-        extract($this->get('type', 'value', 'disabled'));
+        extract($this->get('type', 'value', 'disabled', 'formGrid'));
         $class = $this->getBtnAnchorClasses();
         $attrs = $this->buildHtmlAttrs(['type' => $type, 'class' => $class, 'disabled' => $disabled]);
+
+        if($formGrid){
+            return '<div class="form-group row">
+    <div class="col-sm-12">
+      <button ' . $attrs . '>' . $value . '</button>
+    </div>
+  </div>';
+        }
         return '<button ' . $attrs . '>' . $value . '</button>';
     }
 
@@ -283,11 +330,14 @@ class FormBuilder
 
     private function renderLabel(): string
     {
-        extract($this->get('label', 'formInline', 'render'));
+        extract($this->get('label', 'formInline', 'render', 'formGrid', 'formLabelClass'));
 
         $class = in_array($render, ['checkbox', 'radio']) ? 'form-check-label' : '';
         if ($formInline) {
             $class = join(' ', [$class, 'mx-sm-2']);
+        }
+        if($formGrid){
+            $class = join(' ', [$class, (($formLabelClass) ? $formLabelClass : 'col-sm-2')]);
         }
 
         $id = $this->getId();
@@ -323,8 +373,7 @@ class FormBuilder
 
     private function wrapperInput(string $input): string
     {
-        extract($this->get('type', 'help', 'wrapperAttrs', 'formInline', 'name'));
-
+        extract($this->get('type', 'help', 'wrapperAttrs', 'formInline', 'name', 'formGrid', 'formInputClass'));
         if ($type === 'hidden') {
             return $input;
         }
@@ -336,16 +385,25 @@ class FormBuilder
         $attrs          = $wrapperAttrs ?? [];
         $attrs['class'] = $this->createAttrsList(
             $attrs['class'] ?? null,
-            $formInline ? 'input-group' : 'form-group'
+            $formInline ? 'input-group' : (($formGrid) ? 'form-group row' : 'form-group')
         );
         $attributes = $this->buildHtmlAttrs($attrs, false);
+
+        if($formGrid){
+            if($formInputClass){
+                $input = '<div class="'.$formInputClass.'">' . $input . '</div>';
+            }else{
+                $input = '<div class="col-sm-10">' . $input . '</div>';
+            }
+
+        }
 
         return '<div ' . $attributes . '>' . $label . $input . $helpText . $error . '</div>';
     }
 
     private function wrapperRadioCheckbox(string $input): string
     {
-        extract($this->get('inline', 'name', 'wrapperAttrs'));
+        extract($this->get('inline', 'name', 'wrapperAttrs', 'options'));
 
         $attrs = $wrapperAttrs ?? [];
         $attrs['class'] = $this->createAttrsList(

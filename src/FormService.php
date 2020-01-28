@@ -253,6 +253,17 @@ class FormService
     }
 
     /**
+     * Set form label to col-sm-2, and inputs col-sm-10
+     *
+     * @param string $formGrid
+     * @return FormService
+     */
+    public function formGrid($formGrid = 'true', $formLabelClass = 'col-sm-2', $formInputClass = 'col-sm-10'): FormService
+    {
+        return $this->_set('formGrid', $formGrid)->_set('formLabelClass', $formLabelClass)->_set('formInputClass', $formInputClass);
+    }
+
+    /**
      * Create a file input
      *
      * @param string $name
@@ -440,6 +451,35 @@ class FormService
     public function radio(string $name = null, string $label = null, string $value = null, bool $checked = null): FormService
     {
         return $this->_radioOrCheckbox('radio', $name, $label, $value, $checked);
+    }
+
+    /**
+     * Create a group of radio buttons
+     *
+     * @param string $name
+     * @param string $value
+     * @param string $options
+     * @param bool   $default - selected option
+     * @return FormService
+     */
+    public function radios(string $name = null, string $label = null, $options = [], bool $default = null): FormService
+    {
+        return $this->render('radios')->name($name)->label($label)->options($options)->value($default);
+    }
+
+
+    /**
+     * Create a group of checkbox buttons
+     *
+     * @param string $name
+     * @param string $value
+     * @param string $options
+     * @param bool   $default - selected option
+     * @return FormService
+     */
+    public function checkboxes(string $name = null, string $label = null, $options = [], bool $default = null): FormService
+    {
+        return $this->render('checkboxes')->name($name)->label($label)->options($options)->value($default);
     }
 
     /**
