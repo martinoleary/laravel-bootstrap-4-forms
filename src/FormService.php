@@ -256,9 +256,11 @@ class FormService
      * Set form label to col-sm-2, and inputs col-sm-10
      *
      * @param string $formGrid
+     * @param string $formLabelClass
+     * @param string $formInputClass
      * @return FormService
      */
-    public function formGrid($formGrid = 'true', $formLabelClass = 'col-sm-2', $formInputClass = 'col-sm-10'): FormService
+    public function formGrid($formGrid = 'true', $formLabelClass = 'col-form-label col-sm-2', $formInputClass = 'col-sm-10'): FormService
     {
         return $this->_set('formGrid', $formGrid)->_set('formLabelClass', $formLabelClass)->_set('formInputClass', $formInputClass);
     }

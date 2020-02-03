@@ -69,7 +69,7 @@ class FormBuilder
         $enctype = $formMultipart ? 'multipart/form-data' : null;
 
         $attrs = $this->buildHtmlAttrs([
-            'method' => in_array($method, ['get', 'post']) ? $method : 'post',
+            'method' => in_array($method, ['get', 'post', 'put', 'delete', 'patch']) ? $method : 'post',
             'action' => $url,
             'enctype' => $enctype,
             'autocomplete' => $autocomplete,
@@ -391,11 +391,12 @@ class FormBuilder
 
         if($formGrid){
             if($formInputClass){
-                $input = '<div class="'.$formInputClass.'">' . $input . '</div>';
+                $input = '<div class="'.$formInputClass.'">' . $input  . $helpText . $error . '</div>';
             }else{
-                $input = '<div class="col-sm-10">' . $input . '</div>';
+                $input = '<div class="col-sm-10">' . $input . $helpText . $error . '</div>';
             }
 
+            return '<div ' . $attributes . '>' . $label . $input . '</div>';
         }
 
         return '<div ' . $attributes . '>' . $label . $input . $helpText . $error . '</div>';
